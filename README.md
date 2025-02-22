@@ -5,19 +5,22 @@ Template for task 1 (Signed Distance Fields). Part of Forward and Inverse Render
 Clone this repo with its submodules:
 
     git clone https://github.com/SammaelA/SdfTaskTemplate.git
-    git submodule update --init 
+    cd SdfTaskTemplate
+    git submodule update --init
 
 Install SDF (Ubuntu 22)
 
     sudo apt-get install libsdl2-2.0-0
 
-For installations on other platforms see https://wiki.libsdl.org/
+- For installations on other platforms see https://wiki.libsdl.org/
 
-    cmake CMakeLists.txt && make
+Build the executable:
+
+    cmake -B build && cmake --build build
 
 ## Execute
 
     ./render
 
-Template visualizes one layer of an SDF grid (example_grid.bin, mode of a bunny)
+Template visualizes one layer of an SDF grid (example_grid.bin, mode of a bunny)  
 use W and S keys to swich between layers.

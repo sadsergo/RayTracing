@@ -18,3 +18,6 @@ add_executable(render LiteMath/Image2d.cpp main.cpp)
 
 # Link the SDL2 library to the executable
 target_link_libraries(render ${SDL2_LIBRARIES})
+
+# Set path to executable
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR})
