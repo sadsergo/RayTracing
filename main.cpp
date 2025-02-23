@@ -1,6 +1,13 @@
 #include "LiteMath/LiteMath.h"
 #include "LiteMath/Image2d.h"
 
+// #define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+// #define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
+#include <SDL_keycode.h>
+#include <cstdint>
 #include <iostream>
 #include <fstream>
 #include <SDL.h>
@@ -83,6 +90,28 @@ void draw_frame(const AppData &app_data, std::vector<uint32_t> &pixels)
                             (app_data.height - 1) / app_data.loaded_grid.size.y);
 
   draw_sdf_grid_slice(app_data.loaded_grid, app_data.z_level, voxel_size, app_data.width, app_data.height, pixels);
+}
+
+void save_frame(const char* filename, const std::vector<uint32_t>& frame, uint32_t width, uint32_t height)
+{
+  LiteImage::Image2D<uint32_t> image(width, height, frame.data());
+
+  // Convert from ARGB to ABGR
+  for (uint32_t i = 0; i < width * height; i++) {
+    uint32_t& pixel = image.data()[i];
+    auto a = (pixel & 0xFF000000);
+    auto r = (pixel & 0x00FF0000) >> 16;
+    auto g = (pixel & 0x0000FF00);
+    auto b = (pixel & 0x000000FF) << 16;
+    pixel = a | b | g | r;
+  }
+
+  if (LiteImage::SaveImage(filename, image))
+    std::cout << "Image saved to " << filename << std::endl;
+  else
+    std::cout << "Image could not be saved to " << filename << std::endl;
+  // If you want a slightly more low-level API, You can manually do:
+  //    stbi_write_png(filename, width, height, 4, (unsigned char*)frame.data(), width * 4)
 }
 
 // You must include the command line parameters for your main function to be recognized by SDL
