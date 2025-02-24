@@ -183,7 +183,7 @@ SimpleMesh LoadMeshFromObj(const char* a_fileName, bool verbose)
   std::string warn;
   std::string err;
 
-  bool loading_result = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, a_fileName, a_mtlBaseDir);
+  bool loading_result = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, a_fileName);
 
   if (!loading_result)
   {

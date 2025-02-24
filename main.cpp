@@ -12,6 +12,9 @@
 #include <fstream>
 #include <SDL.h>
 
+#include "mesh.h"
+using namespace cmesh4;
+
 using LiteMath::float2;
 using LiteMath::float3;
 using LiteMath::float4;
@@ -148,6 +151,7 @@ void save_frame(const char* filename, const std::vector<uint32_t>& frame, uint32
 // You must include the command line parameters for your main function to be recognized by SDL
 int main(int argc, char **args)
 {
+  SimpleMesh m = LoadMeshFromObj("lens.obj");
   const int SCREEN_WIDTH = 960;
   const int SCREEN_HEIGHT = 960;
 

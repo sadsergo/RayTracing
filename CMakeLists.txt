@@ -14,7 +14,10 @@ include_directories(${SDL2_INCLUDE_DIRS})
 add_compile_definitions(USE_STB_IMAGE)
 
 # Add the executable
-add_executable(render LiteMath/Image2d.cpp main.cpp)
+add_executable(render
+    main.cpp
+    mesh.cpp
+    LiteMath/Image2d.cpp)
 
 # Link the SDL2 library to the executable
 target_link_libraries(render ${SDL2_LIBRARIES})
