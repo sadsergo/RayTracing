@@ -1,9 +1,11 @@
 #include "LiteMath/LiteMath.h"
 #include "LiteMath/Image2d.h"
 
-// #define STB_IMAGE_IMPLEMENTATION
+// stb_image is a single-header C library, which means one of your cpp files must have
+//    #define STB_IMAGE_IMPLEMENTATION
+//    #define STB_IMAGE_WRITE_IMPLEMENTATION
+// since Image2d already defines the implementation, we don't need to do that here.
 #include "stb_image.h"
-// #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
 #include <SDL_keycode.h>
