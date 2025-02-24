@@ -1,6 +1,7 @@
 #include <cfloat>
 #include <cstring>
 #include <fstream>
+#include <cstdio>
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
