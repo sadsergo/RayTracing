@@ -121,6 +121,7 @@ void draw_sdf_grid_slice(const SdfGrid &grid, int z_level, int voxel_size,
 
 void draw_frame(const AppData &app_data, std::vector<uint32_t> &pixels)
 {
+  //your rendering code goes here
   std::fill_n(pixels.begin(), app_data.width * app_data.height, 0xFFFFFFFF);
   int voxel_size = std::min((app_data.width - 1) / app_data.loaded_grid.size.x,
                             (app_data.height - 1) / app_data.loaded_grid.size.y);
@@ -228,6 +229,7 @@ int main(int argc, char **args)
         // test keycode
         switch (ev.key.keysym.sym)
         {
+        //W and S keys to change the slice of the grid currently rendered
         case SDLK_w:
           app_data.z_level = std::min<int>(app_data.z_level + 1, app_data.loaded_grid.size.z - 1);
           std::cout << "z_level=" << app_data.z_level << std::endl;
@@ -236,6 +238,7 @@ int main(int argc, char **args)
           app_data.z_level = std::max<int>(app_data.z_level - 1, 0);
           std::cout << "z_level=" << app_data.z_level << std::endl;
           break;
+        //ESC to exit 
         case SDLK_ESCAPE:
           running = false;
           break;
