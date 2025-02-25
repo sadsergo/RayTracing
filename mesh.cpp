@@ -2,6 +2,7 @@
 #include <cstring>
 #include <fstream>
 #include <cstdio>
+#include <unordered_map>
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"

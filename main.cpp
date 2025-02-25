@@ -153,7 +153,6 @@ void save_frame(const char* filename, const std::vector<uint32_t>& frame, uint32
 // You must include the command line parameters for your main function to be recognized by SDL
 int main(int argc, char **args)
 {
-  SimpleMesh m = LoadMeshFromObj("lens.obj");
   const int SCREEN_WIDTH = 960;
   const int SCREEN_HEIGHT = 960;
 
@@ -162,7 +161,7 @@ int main(int argc, char **args)
   AppData app_data;
   app_data.width = SCREEN_WIDTH;
   app_data.height = SCREEN_HEIGHT;
-  load_sdf_grid(app_data.loaded_grid, "example_grid.bin");
+  load_sdf_grid(app_data.loaded_grid, "example_grid.grid");
 
   // Initialize SDL. SDL_Init will return -1 if it fails.
   if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
