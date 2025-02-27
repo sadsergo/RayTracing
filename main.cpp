@@ -7,6 +7,8 @@
 // since Image2d already defines the implementation, we don't need to do that here.
 #include "stb_image.h"
 #include "stb_image_write.h"
+#include "Render/render.h"
+
 
 #include <SDL_keycode.h>
 #include <cstdint>
@@ -157,118 +159,136 @@ int main(int argc, char **args)
   const int SCREEN_WIDTH = 960;
   const int SCREEN_HEIGHT = 960;
 
-  // Pixel buffer (RGBA format)
-  std::vector<uint32_t> pixels(SCREEN_WIDTH * SCREEN_HEIGHT, 0xFFFFFFFF); // Initialize with white pixels
-  AppData app_data;
-  app_data.width = SCREEN_WIDTH;
-  app_data.height = SCREEN_HEIGHT;
-  load_sdf_grid(app_data.loaded_grid, "example_grid.grid");
+  SimpleMesh cube = LoadMeshFromObj("cube.obj", false);
+  Settings settings{1};
 
-  // Initialize SDL. SDL_Init will return -1 if it fails.
-  if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
-  {
-    std::cerr << "Error initializing SDL: " << SDL_GetError() << std::endl;
-    return 1;
-  }
+  LiteImage::Image2D<float> image(SCREEN_WIDTH, SCREEN_HEIGHT);
+  
+  Camera camera;
+  camera.position = float3(3, 0, 5);
+  camera.target = float3(0, 0, 0);
+  camera.aspect = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
+  camera.fov = LiteMath::M_PI / 4.0;
 
-  // Create our window
-  SDL_Window *window = SDL_CreateWindow("SDF Viewer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                        SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+  Renderer render;
+  render.meshes.push_back(cube);
 
-  // Make sure creating the window succeeded
-  if (!window)
-  {
-    std::cerr << "Error creating window: " << SDL_GetError() << std::endl;
-    return 1;
-  }
+  render.render(image, settings, camera);
 
-  // Create a renderer
-  SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-  if (!renderer)
-  {
-    std::cerr << "Renderer could not be created! SDL_Error: " << SDL_GetError() << std::endl;
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-    return 1;
-  }
+  LiteImage::SaveImage("cube.png", image);
 
-  // Create a texture
-  SDL_Texture *texture = SDL_CreateTexture(
-      renderer,
-      SDL_PIXELFORMAT_ARGB8888,    // 32-bit RGBA format
-      SDL_TEXTUREACCESS_STREAMING, // Allows us to update the texture
-      SCREEN_WIDTH,
-      SCREEN_HEIGHT);
+  // // Pixel buffer (RGBA format)
+  // std::vector<uint32_t> pixels(SCREEN_WIDTH * SCREEN_HEIGHT, 0xFFFFFFFF); // Initialize with white pixels
+  // AppData app_data;
+  // app_data.width = SCREEN_WIDTH;
+  // app_data.height = SCREEN_HEIGHT;
+  // load_sdf_grid(app_data.loaded_grid, "example_grid.grid");
 
-  if (!texture)
-  {
-    std::cerr << "Texture could not be created! SDL_Error: " << SDL_GetError() << std::endl;
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-    return 1;
-  }
+  // // Initialize SDL. SDL_Init will return -1 if it fails.
+  // if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
+  // {
+  //   std::cerr << "Error initializing SDL: " << SDL_GetError() << std::endl;
+  //   return 1;
+  // }
 
-  SDL_Event ev;
-  bool running = true;
+  // // Create our window
+  // SDL_Window *window = SDL_CreateWindow("SDF Viewer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+  //                                       SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
-  // Main loop
-  while (running)
-  {
-    // Event loop
-    while (SDL_PollEvent(&ev) != 0)
-    {
-      // check event type
-      switch (ev.type)
-      {
-      case SDL_QUIT:
-        // shut down
-        running = false;
-        break;
-      case SDL_KEYDOWN:
-        // test keycode
-        switch (ev.key.keysym.sym)
-        {
-        //W and S keys to change the slice of the grid currently rendered
-        case SDLK_w:
-          app_data.z_level = std::min<int>(app_data.z_level + 1, app_data.loaded_grid.size.z - 1);
-          std::cout << "z_level=" << app_data.z_level << std::endl;
-          break;
-        case SDLK_s:
-          app_data.z_level = std::max<int>(app_data.z_level - 1, 0);
-          std::cout << "z_level=" << app_data.z_level << std::endl;
-          break;
-        //ESC to exit 
-        case SDLK_ESCAPE:
-          running = false;
-          break;
-          // etc
-        }
-        break;
-      }
-    }
+  // // Make sure creating the window succeeded
+  // if (!window)
+  // {
+  //   std::cerr << "Error creating window: " << SDL_GetError() << std::endl;
+  //   return 1;
+  // }
 
-    // Update pixel buffer
-    draw_frame(app_data, pixels);
+  // // Create a renderer
+  // SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+  // if (!renderer)
+  // {
+  //   std::cerr << "Renderer could not be created! SDL_Error: " << SDL_GetError() << std::endl;
+  //   SDL_DestroyWindow(window);
+  //   SDL_Quit();
+  //   return 1;
+  // }
 
-    // Update the texture with the pixel buffer
-    SDL_UpdateTexture(texture, nullptr, pixels.data(), SCREEN_WIDTH * sizeof(uint32_t));
+  // // Create a texture
+  // SDL_Texture *texture = SDL_CreateTexture(
+  //     renderer,
+  //     SDL_PIXELFORMAT_ARGB8888,    // 32-bit RGBA format
+  //     SDL_TEXTUREACCESS_STREAMING, // Allows us to update the texture
+  //     SCREEN_WIDTH,
+  //     SCREEN_HEIGHT);
 
-    // Clear the renderer
-    SDL_RenderClear(renderer);
+  // if (!texture)
+  // {
+  //   std::cerr << "Texture could not be created! SDL_Error: " << SDL_GetError() << std::endl;
+  //   SDL_DestroyRenderer(renderer);
+  //   SDL_DestroyWindow(window);
+  //   SDL_Quit();
+  //   return 1;
+  // }
 
-    // Copy the texture to the renderer
-    SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+  // SDL_Event ev;
+  // bool running = true;
 
-    // Update the screen
-    SDL_RenderPresent(renderer);
-  }
+  // // Main loop
+  // while (running)
+  // {
+  //   // Event loop
+  //   while (SDL_PollEvent(&ev) != 0)
+  //   {
+  //     // check event type
+  //     switch (ev.type)
+  //     {
+  //     case SDL_QUIT:
+  //       // shut down
+  //       running = false;
+  //       break;
+  //     case SDL_KEYDOWN:
+  //       // test keycode
+  //       switch (ev.key.keysym.sym)
+  //       {
+  //       //W and S keys to change the slice of the grid currently rendered
+  //       case SDLK_w:
+  //         app_data.z_level = std::min<int>(app_data.z_level + 1, app_data.loaded_grid.size.z - 1);
+  //         std::cout << "z_level=" << app_data.z_level << std::endl;
+  //         break;
+  //       case SDLK_s:
+  //         app_data.z_level = std::max<int>(app_data.z_level - 1, 0);
+  //         std::cout << "z_level=" << app_data.z_level << std::endl;
+  //         break;
+  //       //ESC to exit 
+  //       case SDLK_ESCAPE:
+  //         running = false;
+  //         break;
+  //         // etc
+  //       }
+  //       break;
+  //     }
+  //   }
 
-  // Destroy the window. This will also destroy the surface
-  SDL_DestroyWindow(window);
+  //   // Update pixel buffer
+  //   draw_frame(app_data, pixels);
 
-  // Quit SDL
-  SDL_Quit();
+  //   // Update the texture with the pixel buffer
+  //   SDL_UpdateTexture(texture, nullptr, pixels.data(), SCREEN_WIDTH * sizeof(uint32_t));
+
+  //   // Clear the renderer
+  //   SDL_RenderClear(renderer);
+
+  //   // Copy the texture to the renderer
+  //   SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+
+  //   // Update the screen
+  //   SDL_RenderPresent(renderer);
+  // }
+
+  // // Destroy the window. This will also destroy the surface
+  // SDL_DestroyWindow(window);
+
+  // // Quit SDL
+  // SDL_Quit();
 
   // End the program
   return 0;

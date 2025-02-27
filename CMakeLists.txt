@@ -17,6 +17,7 @@ add_compile_definitions(USE_STB_IMAGE)
 add_executable(render
     main.cpp
     mesh.cpp
+    Render/render.cpp
     LiteMath/Image2d.cpp)
 
 # Link the SDL2 library to the executable
