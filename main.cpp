@@ -161,11 +161,12 @@ int main(int argc, char **args)
 
   SimpleMesh cube = LoadMeshFromObj("cube.obj", false);
   Settings settings{1};
+  Light light{{3, 2, 0}, {1, 1, 1}};
 
-  LiteImage::Image2D<float> image(SCREEN_WIDTH, SCREEN_HEIGHT);
+  std::vector<uint32_t> pixels(SCREEN_WIDTH * SCREEN_HEIGHT, 0xFF000000);
   
   Camera camera;
-  camera.position = float3(3, 0, 5);
+  camera.position = float3(3, 2, -2);
   camera.target = float3(0, 0, 0);
   camera.aspect = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
   camera.fov = LiteMath::M_PI / 4.0;
@@ -173,9 +174,9 @@ int main(int argc, char **args)
   Renderer render;
   render.meshes.push_back(cube);
 
-  render.render(image, settings, camera);
+  render.render(pixels.data(), SCREEN_WIDTH, SCREEN_HEIGHT, settings, camera, light);
 
-  LiteImage::SaveImage("cube.png", image);
+  save_frame("saves/cube.png", pixels, SCREEN_WIDTH, SCREEN_HEIGHT);
 
   // // Pixel buffer (RGBA format)
   // std::vector<uint32_t> pixels(SCREEN_WIDTH * SCREEN_HEIGHT, 0xFFFFFFFF); // Initialize with white pixels

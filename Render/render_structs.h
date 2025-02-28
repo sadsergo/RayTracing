@@ -22,6 +22,14 @@ struct HitInfo
   HitInfo(const bool isHit = false, const float t = 1e10, const float3& normal = float3(0, 0, 0)) : isHit(isHit), t(t), normal(normal) {}
 };
 
+struct Light
+{
+  float3 pos;
+  float3 color;
+
+  Light(const float3& pos, const float3& color) : pos(pos), color(color) {}
+};
+
 struct Settings
 {
   uint32_t spp;

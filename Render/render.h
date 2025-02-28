@@ -30,7 +30,7 @@ public:
 
   std::vector<SimpleMesh> meshes;
   
-  void render(Image2D<float>& image, const Settings& settings, const Camera& camera) const;
+  void render(uint32_t* data, const uint32_t width, const uint32_t height, const Settings& settings, const Camera& camera, const Light& light) const;
 
 private:
   void IntersectTriangle(const float3& ray_origin, const float3& ray_dir, const uint32_t tr_ind, HitInfo& hit) const;
