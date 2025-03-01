@@ -56,13 +56,10 @@ void Renderer::render(uint32_t* data, const uint32_t width, const uint32_t heigh
         float spec = std::pow(LiteMath::max(dot(ray_dir, reflectDir), 0.0f), 32);
         float3 specular = specularStrenght * spec * light.color;
 
-        color_vec = (ambient + diffuse + specular) * objectColor;
-
         float d = LiteMath::length(light_dir), K_c = 1.f, K_t = 0.09f, K_q = 0.032f;
         float F_att = 1.0 / (K_c + K_t * d + K_q * d * d);
-        float intensity = LiteMath::max(0.1f, dot(minHit.normal, light_dir));
 
-        // color_vec = 255.0f * float3(intensity);
+        color_vec = F_att * (ambient + diffuse + specular) * objectColor;
         
         data[width * y + x] = 0xff << 24 | (uint8_t)color_vec.x << 16 | (uint8_t)color_vec.y << 8 | (uint8_t)color_vec.z;
       }

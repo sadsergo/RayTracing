@@ -161,7 +161,7 @@ int main(int argc, char **args)
 
   SimpleMesh cube = LoadMeshFromObj("cube.obj", false);
   Settings settings{1};
-  Light light{{3, 2, 0}, {1, 1, 1}};
+  Light light{{2, 1, 0}, {1, 1, 1}};
 
   std::vector<uint32_t> pixels(SCREEN_WIDTH * SCREEN_HEIGHT, 0xFF000000);
   
