@@ -4,12 +4,17 @@ cmake_minimum_required(VERSION 3.10)
 project(SdfTask CXX)
 
 # Find the SDL2 library
+
+if(WIN32)
+    set(SDL2_DIR "E:/SDL2/cmake")
+    set(SDL2_INCLUDE_DIR E:/SDL2/include)
+endif()
+
 find_package(SDL2 REQUIRED)
 
 # Include SDL2 headers
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/LiteMath/external)
-include_directories(${SDL2_INCLUDE_DIRS})
 
 add_compile_definitions(USE_STB_IMAGE)
 
