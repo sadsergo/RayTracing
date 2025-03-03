@@ -169,7 +169,7 @@ int main(int argc, char **args)
   camera.position = float3(3, 2, -2);
   camera.target = float3(0, 0, 0);
   camera.aspect = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
-  camera.fov = LiteMath::M_PI / 4.0;
+  camera.fov = M_PI / 4.0;
 
   Renderer render;
   render.models.push_back(cube);

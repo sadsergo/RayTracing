@@ -10,39 +10,17 @@ using LiteMath::float3;
 
 const uint32_t MAX_DEPTH = 10;
 
-struct BVHTriangle
-{
-  float3 VertexA;
-  float3 VertexB;
-  float3 VertexC;
-
-  float3 GetCenter() const
-  {
-    return (VertexA + VertexB + VertexC) / 3.0f;
-  }
-};
-
-class BoundingBox
-{
-public:
-  float3 Min;
-  float3 Max;
-
-  void GrowToInclude(const float3& point);
-  void GrowToInclude(const BVHTriangle triangle);
-  float3 GetCenter() const;
-  float3 Size() const;
-};
-
 struct BVHNode
 {
-  BoundingBox Bounds;
-  std::vector<BVHTriangle> Triangles;
+  float3 aabbMin, aabbMax;
+  uint32_t leftNode, firstTriIdx, triCount;
 
-  uint32_t ChildIndex;
+  bool IsLeaf() const { return triCount > 0; }
+};
 
-  BVHNode(const BoundingBox &bounds, const std::vector<BVHTriangle> &triangles, const uint32_t childIndex) : Bounds(bounds), Triangles(triangles), ChildIndex(childIndex) {}
-  BVHNode() {}
+struct BVHTriangle
+{
+  float3 Vertex0, Vertex1, Vertex2, Centroid;
 };
 
 class BVH
@@ -50,10 +28,9 @@ class BVH
 public:
   std::vector<BVHNode> Nodes;
 
-  void Build(const std::vector<float4> vertices, const std::vector<uint32_t> indices);
-  void Split(BVHNode& parent, const uint32_t depth = 0);
-  void RayTriangleTestBVH(const BVHNode& node, const float3& ray_origin, const float3& ray_dir, HitInfo& hit) const;
-  void RayBoundingBox(const float3 &ray_orig, const float3 &ray_dir, const BoundingBox &bounds, HitInfo &hit) const;
+  void Build(const std::vector<float4> vertices, const std::vector<uint32_t>& indices);
+  void UpdateNodeBounds(uint32_t nodeIdx, const std::vector<BVHTriangle>& tris, const std::vector<uint32_t>& triIdx);
+  void Subdivide(uint32_t nodeIdx, const std::vector<BVHTriangle>& tris, std::vector<uint32_t>& triIdx, uint32_t depth);
 };
 
 float safe_inverse(const float x);
