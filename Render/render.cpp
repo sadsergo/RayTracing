@@ -9,6 +9,9 @@ void Renderer::render(uint32_t* data, const uint32_t width, const uint32_t heigh
 
   up = normalize(cross(camera_dir, right));
 
+  BVH bvh;
+  bvh.Build(models[0]);
+
   for (int y = 0; y < height; y++)
   {
     for (int x = 0; x < width; x++)
@@ -24,7 +27,8 @@ void Renderer::render(uint32_t* data, const uint32_t width, const uint32_t heigh
       
       HitInfo minHit;
 
-      calcRayCollision(ray_orig, ray_dir, minHit);
+      bvh.IntersectBVH(ray_orig, ray_dir, 0, minHit);
+      // calcRayCollision(ray_orig, ray_dir, minHit);
 
       if (minHit.isHit)
       {

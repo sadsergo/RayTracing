@@ -21,16 +21,22 @@ struct BVHNode
 struct BVHTriangle
 {
   float3 Vertex0, Vertex1, Vertex2, Centroid;
+  float3 normal;
 };
 
 class BVH
 {
 public:
   std::vector<BVHNode> Nodes;
+  std::vector<BVHTriangle> tri;
+  std::vector<uint32_t> triIdx;
 
-  void Build(const std::vector<float4> vertices, const std::vector<uint32_t>& indices);
-  void UpdateNodeBounds(uint32_t nodeIdx, const std::vector<BVHTriangle>& tris, const std::vector<uint32_t>& triIdx);
-  void Subdivide(uint32_t nodeIdx, const std::vector<BVHTriangle>& tris, std::vector<uint32_t>& triIdx, uint32_t depth);
+  void Build(const SimpleMesh& mesh);
+  void UpdateNodeBounds(uint32_t nodeIdx);
+  void Subdivide(uint32_t nodeIdx, uint32_t depth);
+  void IntersectBVH(const float3& ray_origin, const float3& ray_dir, const uint32_t nodeIdx, HitInfo& hit) const;
+  void IntersectAABB(const float3& ray_origin, const float3& ray_dir, const float3& bmin, const float3& bmax, HitInfo& hit) const;
+  void IntersectTriangle(const float3& ray_origin, const float3& ray_dir, const BVHTriangle& tri, HitInfo& hit) const;
 };
 
 float safe_inverse(const float x);

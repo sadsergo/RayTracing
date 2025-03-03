@@ -159,14 +159,14 @@ int main(int argc, char **args)
   const int SCREEN_WIDTH = 960;
   const int SCREEN_HEIGHT = 960;
 
-  SimpleMesh cube = LoadMeshFromObj("cube.obj", false);
+  SimpleMesh cube = LoadMeshFromObj("stanford-bunny.obj", false);
   Settings settings{1};
-  Light light{{3, 2, 0}, {1, 1, 1}};
+  Light light{{0.1, 0, 0}, {1, 1, 1}};
 
   std::vector<uint32_t> pixels(SCREEN_WIDTH * SCREEN_HEIGHT, 0xFF000000);
   
   Camera camera;
-  camera.position = float3(3, 2, -2);
+  camera.position = float3(0.5, 0, 0);
   camera.target = float3(0, 0, 0);
   camera.aspect = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
   camera.fov = M_PI / 4.0;
@@ -174,12 +174,9 @@ int main(int argc, char **args)
   Renderer render;
   render.models.push_back(cube);
 
-  BVH bvh;
-  bvh.Build(cube.vPos4f, cube.indices);
+  render.render(pixels.data(), SCREEN_WIDTH, SCREEN_HEIGHT, settings, camera, light);
 
-  // render.render(pixels.data(), SCREEN_WIDTH, SCREEN_HEIGHT, settings, camera, light);
-
-  // save_frame("saves/cube.png", pixels, SCREEN_WIDTH, SCREEN_HEIGHT);
+  save_frame("saves/as1-oc-214_bvh.png", pixels, SCREEN_WIDTH, SCREEN_HEIGHT);
 
   // // Pixel buffer (RGBA format)
   // std::vector<uint32_t> pixels(SCREEN_WIDTH * SCREEN_HEIGHT, 0xFFFFFFFF); // Initialize with white pixels
