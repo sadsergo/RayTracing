@@ -24,19 +24,7 @@ void Renderer::render(uint32_t* data, const uint32_t width, const uint32_t heigh
       
       HitInfo minHit;
 
-      for (int i = 0; i < meshes[0].IndicesNum(); i += 3)
-      {
-        HitInfo hit;
-        
-        IntersectTriangle(ray_orig, ray_dir, i, hit);
-
-        if (hit.isHit && minHit.t > hit.t)
-        {
-          minHit.isHit = true;
-          minHit.normal = hit.normal;
-          minHit.t = hit.t;
-        } 
-      }
+      calcRayCollision(ray_orig, ray_dir, minHit);
 
       if (minHit.isHit)
       {
@@ -56,10 +44,11 @@ void Renderer::render(uint32_t* data, const uint32_t width, const uint32_t heigh
         float spec = std::pow(LiteMath::max(dot(ray_dir, reflectDir), 0.0f), 32);
         float3 specular = specularStrenght * spec * light.color;
 
-        float d = LiteMath::length(light_dir), K_c = 1.f, K_t = 0.09f, K_q = 0.032f;
-        float F_att = 1.0 / (K_c + K_t * d + K_q * d * d);
+        // float d = LiteMath::length(light_dir), K_c = 1.f, K_t = 0.09f, K_q = 0.032f;
+        // float F_att = 1.0 / (K_c + K_t * d + K_q * d * d);
+        // F_att = 1;
 
-        color_vec = F_att * (ambient + diffuse + specular) * objectColor;
+        color_vec = (ambient + diffuse + specular) * objectColor;
         
         data[width * y + x] = 0xff << 24 | (uint8_t)color_vec.x << 16 | (uint8_t)color_vec.y << 8 | (uint8_t)color_vec.z;
       }
@@ -67,15 +56,44 @@ void Renderer::render(uint32_t* data, const uint32_t width, const uint32_t heigh
   }
 }
 
-void Renderer::IntersectTriangle(const float3& ray_origin, const float3& ray_dir, const uint32_t ind, HitInfo& hit) const
+void Renderer::calcRayCollision(const float3 &ray_origin, const float3 &ray_dir, HitInfo &hit) const
 {
-  uint32_t ind1 = meshes[0].indices[ind + 0];
-  uint32_t ind2 = meshes[0].indices[ind + 1];
-  uint32_t ind3 = meshes[0].indices[ind + 2];
+  for (int model_ind = 0; model_ind < models.size(); model_ind++)
+  {
+    HitInfo minHit;
 
-  float3 v0 = float3(meshes[0].vPos4f[ind1].x, meshes[0].vPos4f[ind1].y, meshes[0].vPos4f[ind1].z);
-  float3 v1 = float3(meshes[0].vPos4f[ind2].x, meshes[0].vPos4f[ind2].y, meshes[0].vPos4f[ind2].z);
-  float3 v2 = float3(meshes[0].vPos4f[ind3].x, meshes[0].vPos4f[ind3].y, meshes[0].vPos4f[ind3].z);
+    for (int i = 0; i < models[model_ind].IndicesNum(); i += 3)
+    {
+      HitInfo cur_hit;
+
+      IntersectTriangle(ray_origin, ray_dir, model_ind, i, cur_hit);
+
+      if (cur_hit.isHit && minHit.t > cur_hit.t)
+      {
+        minHit.isHit = true;
+        minHit.normal = cur_hit.normal;
+        minHit.t = cur_hit.t;
+      }
+    }
+
+    if (minHit.isHit && hit.t > minHit.t)
+    {
+      hit.isHit = true;
+      hit.normal = minHit.normal;
+      hit.t = minHit.t;
+    }
+  }
+}
+
+void Renderer::IntersectTriangle(const float3 &ray_origin, const float3 &ray_dir, const uint32_t model_ind, const uint32_t tr_ind, HitInfo &hit) const
+{
+  uint32_t ind1 = models[model_ind].indices[tr_ind + 0];
+  uint32_t ind2 = models[model_ind].indices[tr_ind + 1];
+  uint32_t ind3 = models[model_ind].indices[tr_ind + 2];
+
+  float3 v0 = float3(models[model_ind].vPos4f[ind1].x, models[model_ind].vPos4f[ind1].y, models[model_ind].vPos4f[ind1].z);
+  float3 v1 = float3(models[model_ind].vPos4f[ind2].x, models[model_ind].vPos4f[ind2].y, models[model_ind].vPos4f[ind2].z);
+  float3 v2 = float3(models[model_ind].vPos4f[ind3].x, models[model_ind].vPos4f[ind3].y, models[model_ind].vPos4f[ind3].z);
 
   float3 e1 = v1 - v0;
   float3 e2 = v2 - v0;
@@ -109,7 +127,7 @@ void Renderer::IntersectTriangle(const float3& ray_origin, const float3& ray_dir
   hit.isHit = true;
   hit.t = dot(e2, qvec) * inv_det;
 
-  hit.normal = normalize(LiteMath::to_float3(meshes[0].vNorm4f[ind1]));
+  hit.normal = normalize(LiteMath::to_float3(models[model_ind].vNorm4f[ind1]));
 
   // if (dot(hit.normal, ray_dir) > 0)
   // {

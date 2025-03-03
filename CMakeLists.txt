@@ -24,6 +24,7 @@ add_executable(render
     mesh.cpp
     Render/render.cpp
     Render/bvh.cpp
+    model_structs/model.cpp
     LiteMath/Image2d.cpp)
 
 # Link the SDL2 library to the executable

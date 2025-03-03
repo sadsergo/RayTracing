@@ -8,7 +8,7 @@
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include "Render/render.h"
-
+#include "Render/bvh.h"
 
 #include <SDL_keycode.h>
 #include <cstdint>
@@ -161,7 +161,7 @@ int main(int argc, char **args)
 
   SimpleMesh cube = LoadMeshFromObj("cube.obj", false);
   Settings settings{1};
-  Light light{{2, 1, 0}, {1, 1, 1}};
+  Light light{{3, 2, 0}, {1, 1, 1}};
 
   std::vector<uint32_t> pixels(SCREEN_WIDTH * SCREEN_HEIGHT, 0xFF000000);
   
@@ -172,11 +172,14 @@ int main(int argc, char **args)
   camera.fov = LiteMath::M_PI / 4.0;
 
   Renderer render;
-  render.meshes.push_back(cube);
+  render.models.push_back(cube);
 
-  render.render(pixels.data(), SCREEN_WIDTH, SCREEN_HEIGHT, settings, camera, light);
+  BVH bvh;
+  bvh.Build(cube.vPos4f, cube.indices);
 
-  save_frame("saves/cube.png", pixels, SCREEN_WIDTH, SCREEN_HEIGHT);
+  // render.render(pixels.data(), SCREEN_WIDTH, SCREEN_HEIGHT, settings, camera, light);
+
+  // save_frame("saves/cube.png", pixels, SCREEN_WIDTH, SCREEN_HEIGHT);
 
   // // Pixel buffer (RGBA format)
   // std::vector<uint32_t> pixels(SCREEN_WIDTH * SCREEN_HEIGHT, 0xFFFFFFFF); // Initialize with white pixels
