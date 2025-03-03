@@ -3,6 +3,7 @@
 #include "../mesh.h"
 #include "LiteMath/LiteMath.h"
 #include "LiteMath/Image2d.h"
+#include "bvh.h"
 #include "render_structs.h"
 
 #include <vector>
@@ -28,10 +29,12 @@ class Renderer
 public:
   Renderer() {}
 
-  std::vector<SimpleMesh> meshes;
+  std::vector<SimpleMesh> models;
+  BVH bvh;
   
   void render(uint32_t* data, const uint32_t width, const uint32_t height, const Settings& settings, const Camera& camera, const Light& light) const;
 
 private:
-  void IntersectTriangle(const float3& ray_origin, const float3& ray_dir, const uint32_t tr_ind, HitInfo& hit) const;
+  void calcRayCollision(const float3& ray_origin, const float3& ray_dir, HitInfo& hit) const;
+  void IntersectTriangle(const float3 &ray_origin, const float3 &ray_dir, const uint32_t model_ind, const uint32_t tr_ind, HitInfo &hit) const;
 };

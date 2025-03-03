@@ -33,9 +33,11 @@ render
 
 #CMake
 build/
+Debug/
+Release/
 CMakeFiles/*
 cmake_install.cmake
 CMakeCache.txt
 Makefile
 
-saves/
+saves/*
