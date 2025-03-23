@@ -1,5 +1,5 @@
-#include "LiteMath/LiteMath.h"
-#include "LiteMath/Image2d.h"
+#include <LiteMath.h>
+#include <Image2d.h>
 
 // stb_image is a single-header C library, which means one of your cpp files must have
 //    #define STB_IMAGE_IMPLEMENTATION
@@ -7,8 +7,8 @@
 // since Image2d already defines the implementation, we don't need to do that here.
 #include "stb_image.h"
 #include "stb_image_write.h"
-#include "Render/render.h"
-#include "Render/bvh.h"
+#include "Render/Render_CPU/render.h"
+#include "Render/Render_CPU/bvh.h"
 
 #include <SDL_keycode.h>
 #include <cstdint>
@@ -16,8 +16,11 @@
 #include <fstream>
 #include <SDL.h>
 
-#include "mesh.h"
+#include "structs/mesh.h"
 using namespace cmesh4;
+
+#include "structs/grid.h"
+#include "structs/octree.h"
 
 using LiteMath::float2;
 using LiteMath::float3;
@@ -28,61 +31,6 @@ using LiteMath::int4;
 using LiteMath::uint2;
 using LiteMath::uint3;
 using LiteMath::uint4;
-
-struct SdfGrid
-{
-  uint3 size;
-  std::vector<float> data; // size.x*size.y*size.z values
-};
-
-void save_sdf_grid(const SdfGrid &scene, const std::string &path)
-{
-  std::ofstream fs(path, std::ios::binary);
-  fs.write((const char *)&scene.size, 3 * sizeof(unsigned));
-  fs.write((const char *)scene.data.data(), scene.size.x * scene.size.y * scene.size.z * sizeof(float));
-  fs.flush();
-  fs.close();
-}
-
-void load_sdf_grid(SdfGrid &scene, const std::string &path)
-{
-  std::ifstream fs(path, std::ios::binary);
-  fs.read((char *)&scene.size, 3 * sizeof(unsigned));
-  scene.data.resize(scene.size.x * scene.size.y * scene.size.z);
-  fs.read((char *)scene.data.data(), scene.size.x * scene.size.y * scene.size.z * sizeof(float));
-  fs.close();
-}
-
-struct SdfOctreeNode
-{
-  float values[8];
-  unsigned offset; // offset for children (they are stored together). 0 offset means it's a leaf
-};
-
-struct SdfOctree
-{
-  std::vector<SdfOctreeNode> nodes;
-};
-
-void save_sdf_octree(const SdfOctree &scene, const std::string &path)
-{
-  std::ofstream fs(path, std::ios::binary);
-  size_t size = scene.nodes.size();
-  fs.write((const char *)&size, sizeof(unsigned));
-  fs.write((const char *)scene.nodes.data(), size * sizeof(SdfOctreeNode));
-  fs.flush();
-  fs.close();
-}
-
-void load_sdf_octree(SdfOctree &scene, const std::string &path)
-{
-  std::ifstream fs(path, std::ios::binary);
-  unsigned sz = 0;
-  fs.read((char *)&sz, sizeof(unsigned));
-  scene.nodes.resize(sz);
-  fs.read((char *)scene.nodes.data(), scene.nodes.size() * sizeof(SdfOctreeNode));
-  fs.close();
-}
 
 struct AppData
 {
@@ -156,18 +104,19 @@ void save_frame(const char* filename, const std::vector<uint32_t>& frame, uint32
 // You must include the command line parameters for your main function to be recognized by SDL
 int main(int argc, char **args)
 {
-  const int SCREEN_WIDTH = 960;
-  const int SCREEN_HEIGHT = 960;
+  const int SCREEN_WIDTH = 500;
+  const int SCREEN_HEIGHT = 500;
 
-  SimpleMesh cube = LoadMeshFromObj("stanford-bunny.obj", false);
+  SimpleMesh cube = LoadMeshFromObj("docs/cube.obj", false);
+  
   Settings settings{1};
-  Light light{{0.1, 0, 0}, {1, 1, 1}};
+  Light light{{1, 2, 1}, {1, 1, 1}};
 
   std::vector<uint32_t> pixels(SCREEN_WIDTH * SCREEN_HEIGHT, 0xFF000000);
   
   Camera camera;
-  camera.position = float3(0.5, 0, 0);
-  camera.target = float3(0, 0, 0);
+  camera.position = float3(2, 2, 2);
+  camera.target = float3(0, 0.1, 0);
   camera.aspect = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
   camera.fov = M_PI / 4.0;
 
@@ -176,7 +125,7 @@ int main(int argc, char **args)
 
   render.render(pixels.data(), SCREEN_WIDTH, SCREEN_HEIGHT, settings, camera, light);
 
-  save_frame("saves/as1-oc-214_bvh.png", pixels, SCREEN_WIDTH, SCREEN_HEIGHT);
+  save_frame("saves/cube.png", pixels, SCREEN_WIDTH, SCREEN_HEIGHT);
 
   // // Pixel buffer (RGBA format)
   // std::vector<uint32_t> pixels(SCREEN_WIDTH * SCREEN_HEIGHT, 0xFFFFFFFF); // Initialize with white pixels

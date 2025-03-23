@@ -1,3 +1,6 @@
-[submodule "LiteMath"]
-	path = LiteMath
-	url = https://github.com/msu-graphics-group/LiteMath
+[submodule "external/LiteMath"]
+	path = external/LiteMath
+	url = https://github.com/msu-graphics-group/LiteMath.git
+[submodule "external/nvpro_core"]
+	path = external/nvpro_core
+	url = https://github.com/nvpro-samples/nvpro_core.git
