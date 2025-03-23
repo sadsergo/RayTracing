@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 #define TINYOBJLOADER_IMPLEMENTATION
-#include "tiny_obj_loader.h"
+#include "../Loader/tiny_obj_loader.h"
 
 #include "mesh.h"
 
