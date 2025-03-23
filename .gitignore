@@ -29,7 +29,6 @@
 *.exe
 *.out
 *.app
-render
 
 #CMake
 build
