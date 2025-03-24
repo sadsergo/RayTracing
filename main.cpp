@@ -118,10 +118,13 @@ int main(int argc, char **args)
   camera.position = float3(2, 2, 2);
   camera.target = float3(0, 0.1, 0);
   camera.aspect = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
-  camera.fov = M_PI / 4.0;
+  camera.fov =  LiteMath::M_PI / 4.0;
 
   Renderer render;
   render.models.push_back(cube);
+
+  int s = 32;
+  auto grid = mesh2Grid(cube, {s, s, s});
 
   render.render(pixels.data(), SCREEN_WIDTH, SCREEN_HEIGHT, settings, camera, light);
 

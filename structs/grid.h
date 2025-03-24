@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <glm/vec3.hpp>
+#include <glm/glm.hpp>
 #include <string>
 #include <fstream>
 #include "mesh.h"
